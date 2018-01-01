@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{06CA7179-31AC-4296-84A7-6C5E00D847D5}</ProjectGuid>
+    <ProjectGuid>{D52CCCD2-C1C6-4B3C-A8AF-B22F9A3F3093}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Calculator</RootNamespace>
-    <AssemblyName>Calculator</AssemblyName>
+    <RootNamespace>Collections</RootNamespace>
+    <AssemblyName>Collections</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -41,14 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Calculator.cs" />
-    <Compile Include="ExpressionTree.cs" />
-    <Compile Include="ExpressionTreeBuilder.cs" />
-    <Compile Include="Operators\Abstracts\Operator.cs" />
-    <Compile Include="Operators\Div.cs" />
-    <Compile Include="Operators\Mul.cs" />
-    <Compile Include="Operators\Sub.cs" />
-    <Compile Include="Operators\Sum.cs" />
+    <Compile Include="MyList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
