@@ -14,6 +14,7 @@ namespace Custom.Collections
 
         private T[] _core;
         private int _count = 0;
+        private int _version = int.MinValue;
         private Enumerator _enumerator;
 
         public int Capacity => _core.Length;
@@ -41,7 +42,7 @@ namespace Custom.Collections
             {
                 CheckIndex(index);
                 _core[index] = value;
-                InvalidateEnumerators();
+                _version++;
             }
         }
 
@@ -63,7 +64,7 @@ namespace Custom.Collections
         {
             IncreaseCount();
             _core[_count - 1] = item;
-            InvalidateEnumerators();
+            _version++;
         }
 
         public void Insert(int index, T item)
@@ -72,7 +73,7 @@ namespace Custom.Collections
             IncreaseCount();
             Array.Copy(_core, index, _core, index + 1, _count - index - 1);
             _core[index] = item;
-            InvalidateEnumerators();
+            _version++;
         }
 
         public bool Remove(T item)
@@ -95,14 +96,14 @@ namespace Custom.Collections
                 Array.Copy(_core, index + 1, _core, index, _count - index - 1);
             _core[_count - 1] = default(T);
             _count--;
-            InvalidateEnumerators();
+            _version++;
         }
 
         public void Clear()
         {
             Array.Clear(_core, 0, _count);
             _count = 0;
-            InvalidateEnumerators();
+            _version++;
         }
 
         public void CopyTo(T[] array, int arrayIndex)
@@ -112,8 +113,7 @@ namespace Custom.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-            var enumerator = new Enumerator(this) { Sibling = _enumerator };
-            return _enumerator = enumerator;
+            return new Enumerator(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -161,31 +161,22 @@ namespace Custom.Collections
             _count++;
         }
 
-        private void InvalidateEnumerators()
-        {
-            while (_enumerator != null)
-            {
-                _enumerator.IsValid = false;
-                _enumerator = _enumerator.Sibling;
-            }
-        }
 
 
-
-        private class Enumerator : IEnumerator<T>
+        private struct Enumerator : IEnumerator<T>
         {
             private readonly MyList<T> _source;
 
-            private int _index = -1;
-
-            public Enumerator Sibling { get; set; }
-            public bool IsValid { get; set; }
+            private int _index;
+            private readonly int _version;
 
             public T Current
             {
                 get
                 {
                     Validate();
+                    if (_index >= _source.Count)
+                        throw new InvalidOperationException("No more elements in the collection.");
                     if (_index == -1)
                         throw new InvalidOperationException("MoveNext method should be called before accessing Current property.");
                     return _source[_index];
@@ -198,7 +189,8 @@ namespace Custom.Collections
             public Enumerator(MyList<T> source)
             {
                 _source = source;
-                IsValid = true;
+                _index = -1;
+                _version = source._version;
             }
 
 
@@ -219,14 +211,16 @@ namespace Custom.Collections
 
             public override string ToString()
             {
-                return _index < 0 ? "Not initialized" : Current.ToString();
+                return _index < 0 ? "Not initialized" : 
+                    _index < _source.Count ? Current.ToString() : "Finished enumerating";
             }
 
 
 
             private void Validate()
             {
-                if (!IsValid) throw new InvalidOperationException("Collection was modified.");
+                if (this._version != _source._version)
+                    throw new InvalidOperationException("Collection was modified.");
             }
         }
     }

@@ -50,5 +50,16 @@ namespace Collections.Tests
             enum3.MoveNext();
             Assert.Equal(enum3.Current, 2);
         }
+
+        [Fact]
+        [Trait("MyList", "Enumerator")]
+        public void TestMethod3()
+        {
+            var list = new MyList<object>();
+            var enumerator = list.GetEnumerator();
+            Assert.Throws<InvalidOperationException>(() => enumerator.Current);
+            Assert.False(enumerator.MoveNext());
+            Assert.Throws<InvalidOperationException>(() => enumerator.Current);
+        }
     }
 }
